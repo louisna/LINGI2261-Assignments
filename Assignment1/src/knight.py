@@ -12,9 +12,10 @@ class Knight(Problem):
 
     def successor(self, state):
         (x, y) = state.getWhite()
+        ret = []
         for (nx, ny) in self.get_successor(x, y):
             if self.valid_successor(nx, ny, state):
-                yield ((x, y), self.new_state(nx, ny, state, x, y))
+                yield ((nx, ny), self.new_state(nx, ny, state, x, y))
 
     def goal_test(self, state):
         for i in range(state.nRows):
@@ -32,7 +33,10 @@ class Knight(Problem):
 
     def new_state(self, x, y, state, old_x, old_y):
         tmp = State([state.nCols, state.nRows], (old_x, old_y))
-        tmp.grid = state.grid.copy()
+        # tmp.grid = state.grid.copy()
+        for i in range(state.nRows):
+            for j in range(state.nCols):
+                tmp.grid[i][j] = state.grid[i][j]
         tmp.grid[old_x][old_y] = u"\u265E"
         tmp.grid[x][y] = u"\u2658"
         return tmp
@@ -56,6 +60,11 @@ class State:
             for j in range(self.nCols):
                 if self.grid[i][j] == "♘":
                     return (i, j)
+
+    def print_grid(self):
+        print('\n')
+        for i in self.grid:
+            print(i)
 
     def __str__(self):
         nsharp = (2 * self.nCols) + (self.nCols // 5)
@@ -119,6 +128,7 @@ for instance in instances:
         print()
     print("nb nodes explored = ", nbExploredNodes)
     print("time : " + str(endTime - startTime))
+    break
 """
 ####################################
 # Launch the search for INGInious  #

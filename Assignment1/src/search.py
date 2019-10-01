@@ -125,6 +125,7 @@ def graph_search(problem, fringe):
     fringe.append(Node(problem.initial))
     while fringe:
         node = fringe.pop()
+        #print(node.state.print_grid())
         n += 1
         #sys.stdout.write("\rnumber of explored nodes = " + str(n))
         if problem.goal_test(node.state):
