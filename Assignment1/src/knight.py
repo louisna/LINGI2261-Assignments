@@ -11,7 +11,7 @@ from search import *
 class Knight(Problem):
 
     def successor(self, state):
-        (x, y) = state.getWhite()
+        (x, y) = state.get_white()
         for (nx, ny) in self.get_successor(x, y):
             if self.valid_successor(nx, ny, state):
                 yield ((nx, ny), self.new_state(nx, ny, state, x, y))
@@ -30,7 +30,7 @@ class Knight(Problem):
         return 0 <= x < state.nRows and 0 <= y < state.nCols and state.grid[x][y] == " "
 
     def new_state(self, x, y, state, old_x, old_y):
-        tmp = State([state.nCols, state.nRows], (x, y))
+        tmp = State([state.nCols, state.nRows], (x, y),0)
         tmp.grid = [x[:] for x in state.grid]
         tmp.grid[old_x][old_y] = u"\u265E"
         tmp.grid[x][y] = u"\u2658"
@@ -42,16 +42,17 @@ class Knight(Problem):
 ###############
 
 class State:
-    def __init__(self, shape, init_pos):
+    def __init__(self, shape, init_pos, bool=True):
         self.nCols = shape[0]
         self.nRows = shape[1]
-        self.grid = []
-        for i in range(self.nRows):
-            self.grid.append([" "] * self.nCols)
-        self.grid[init_pos[0]][init_pos[1]] = "♘"
         self.pos_init = init_pos
+        self.grid = []
+        if bool:
+            for i in range(self.nRows):
+                self.grid.append([" "] * self.nCols)
+            self.grid[init_pos[0]][init_pos[1]] = "♘"
 
-    def getWhite(self):
+    def get_white(self):
         return self.pos_init[0], self.pos_init[1]
 
     def print_grid(self):
@@ -85,7 +86,6 @@ class State:
         return hash((self.nCols, self.nRows, tuple(map(tuple, self.grid))))
 
 
-"""
 ##############################
 # Launch the search in local #
 ##############################
@@ -100,11 +100,11 @@ for instance in instances:
     init_pos = (int(elts[2]), int(elts[3]))
     init_state = State(shape, init_pos)
 
-    problem = Knight(init_state)  ###### define goal ##########
+    problem = Knight(init_state)
 
     # example of bfs graph search
     startTime = time.perf_counter()
-    node, nbExploredNodes = depth_first_graph_search(problem)
+    node, nbExploredNodes = iterative_deepening_search(problem)
     endTime = time.perf_counter()
 
     # example of print
@@ -131,7 +131,7 @@ problem = Knight(init_state)
 
 # example of bfs graph search
 startTime = time.perf_counter()
-node, nbExploredNodes = depth_first_graph_search(problem)
+node, nbExploredNodes = depth_first_tree_search(problem)
 endTime = time.perf_counter()
 
 # example of print
@@ -144,3 +144,4 @@ for n in path:
     print()
 print("nb nodes explored = ", nbExploredNodes)
 print("time : " + str(endTime - startTime))
+"""""
