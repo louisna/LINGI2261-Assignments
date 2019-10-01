@@ -12,9 +12,9 @@ class Knight(Problem):
 
     def successor(self, state):
         (x, y) = state.getWhite()
-        for i in self.get_successor(x, y):
-            if self.valid_successor(i, state):
-                yield (i, self.new_state(i, state, (x, y)))
+        for (nx, ny) in self.get_successor(x, y):
+            if self.valid_successor(nx, ny, state):
+                yield (i, self.new_state(nx, ny, state, (x, y)))
 
     def goal_test(self, state):
         for i in range(state.nRows):
@@ -27,10 +27,10 @@ class Knight(Problem):
         return [(x + 2, y - 1), (x + 2, y + 1), (x + 1, y + 2), (x - 1, y + 2), (x - 2, y + 1), (x - 2, y - 1),
                 (x - 1, y - 2), (x + 1, y - 2)]
 
-    def valid_successor(self, (x, y), state):
+    def valid_successor(self, x, y, state):
         return 0 <= x < state.nRows and 0 <= y < state.nCols and state.grid[x, y] == " "
 
-    def new_state(self, (x,y), state, (old_x, old_y)):
+    def new_state(self, x, y, state, old_x, old_y):
         tmp = State([state.nCols, state.nRows], (old_x, old_y))
         tmp.grid = state.grid.copy()
         tmp.grid[old_x][old_y] = u"\u265E"
@@ -82,6 +82,9 @@ class State:
 
     def __ne__(self, other):
         return not (self == other)
+
+    def __hash__(self):
+        return hash((self.nCols, self.nRows, tuple(map(tuple, self.grid))))
 
 
 
