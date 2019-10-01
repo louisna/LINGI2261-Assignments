@@ -33,10 +33,7 @@ class Knight(Problem):
 
     def new_state(self, x, y, state, old_x, old_y):
         tmp = State([state.nCols, state.nRows], (old_x, old_y))
-        # tmp.grid = state.grid.copy()
-        for i in range(state.nRows):
-            for j in range(state.nCols):
-                tmp.grid[i][j] = state.grid[i][j]
+        tmp.grid = [x[:] for x in state.grid]
         tmp.grid[old_x][old_y] = u"\u265E"
         tmp.grid[x][y] = u"\u2658"
         return tmp
@@ -115,7 +112,7 @@ for instance in instances:
 
     # example of bfs graph search
     startTime = time.perf_counter()
-    node, nbExploredNodes = breadth_first_graph_search(problem)
+    node, nbExploredNodes = depth_first_graph_search(problem)
     endTime = time.perf_counter()
 
     # example of print
