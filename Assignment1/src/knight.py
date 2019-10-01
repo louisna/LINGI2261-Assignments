@@ -12,16 +12,14 @@ class Knight(Problem):
 
     def successor(self, state):
         (x, y) = state.getWhite()
-        ret = []
         for (nx, ny) in self.get_successor(x, y):
             if self.valid_successor(nx, ny, state):
                 yield ((nx, ny), self.new_state(nx, ny, state, x, y))
 
     def goal_test(self, state):
-        for i in range(state.nRows):
-            for j in range(state.nCols):
-                if state.grid[i][j] == " ":
-                    return False
+        for i in state.grid:
+            if " " in i:
+                return False
         return True
 
     def get_successor(self, x, y):
@@ -80,11 +78,7 @@ class State:
         return s
 
     def __eq__(self, other):
-        for i in range(self.nRows):
-            for j in range(self.nCols):
-                if self.grid[i][j] != other.grid[i][j]:
-                    return False
-        return True
+        return self.grid == other.grid
 
     def __ne__(self, other):
         return not (self == other)
