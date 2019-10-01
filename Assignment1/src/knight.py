@@ -14,7 +14,7 @@ class Knight(Problem):
         (x, y) = state.getWhite()
         for (nx, ny) in self.get_successor(x, y):
             if self.valid_successor(nx, ny, state):
-                yield (i, self.new_state(nx, ny, state, (x, y)))
+                yield ((x, y), self.new_state(nx, ny, state, x, y))
 
     def goal_test(self, state):
         for i in range(state.nRows):
@@ -28,7 +28,7 @@ class Knight(Problem):
                 (x - 1, y - 2), (x + 1, y - 2)]
 
     def valid_successor(self, x, y, state):
-        return 0 <= x < state.nRows and 0 <= y < state.nCols and state.grid[x, y] == " "
+        return 0 <= x < state.nRows and 0 <= y < state.nCols and state.grid[x][y] == " "
 
     def new_state(self, x, y, state, old_x, old_y):
         tmp = State([state.nCols, state.nRows], (old_x, old_y))
