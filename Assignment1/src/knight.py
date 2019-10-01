@@ -11,13 +11,34 @@ from search import *
 class Knight(Problem):
 
     def successor(self, state):
-        pass
+        (x, y) = state.getWhite()
+        for i in self.get_successor(x, y):
+            if self.valid_successor(i, state):
+                yield (i, self.new_state(i, state, (x, y)))
 
     def goal_test(self, state):
-        pass
+        for i in range(state.nRows):
+            for j in range(state.nCols):
+                if state.grid[i][j] == " ":
+                    return False
+        return True
+
+    def get_successor(self, x, y):
+        return [(x + 2, y - 1), (x + 2, y + 1), (x + 1, y + 2), (x - 1, y + 2), (x - 2, y + 1), (x - 2, y - 1),
+                (x - 1, y - 2), (x + 1, y - 2)]
+
+    def valid_successor(self, (x, y), state):
+        return 0 <= x < state.nRows and 0 <= y < state.nCols and state.grid[x, y] == " "
+
+    def new_state(self, (x,y), state, (old_x, old_y)):
+        tmp = State([state.nCols, state.nRows], (old_x, old_y))
+        tmp.grid = state.grid.copy()
+        tmp.grid[old_x][old_y] = u"\u265E"
+        tmp.grid[x][y] = u"\u2658"
+        return tmp
+    ###############
 
 
-###############
 # State class #
 ###############
 
@@ -29,6 +50,12 @@ class State:
         for i in range(self.nRows):
             self.grid.append([" "] * self.nCols)
         self.grid[init_pos[0]][init_pos[1]] = "♘"
+
+    def getWhite(self):
+        for i in range(self.nRows):
+            for j in range(self.nCols):
+                if self.grid[i][j] == "♘":
+                    return (i, j)
 
     def __str__(self):
         nsharp = (2 * self.nCols) + (self.nCols // 5)
@@ -46,11 +73,22 @@ class State:
         s += "#" * nsharp
         return s
 
+    def __eq__(self, other):
+        for i in range(self.nRows):
+            for j in range(self.nCols):
+                if self.grid[i][j] != other.grid[i][j]:
+                    return False
+        return True
+
+    def __ne__(self, other):
+        return not (self == other)
+
+
 
 ##############################
 # Launch the search in local #
 ##############################
-#Use this block to test your code in local
+# Use this block to test your code in local
 # Comment it and uncomment the next one if you want to submit your code on INGInious
 with open('instances.txt') as f:
     instances = f.read().splitlines()
@@ -61,7 +99,7 @@ for instance in instances:
     init_pos = (int(elts[2]), int(elts[3]))
     init_state = State(shape, init_pos)
 
-    problem = Knight(init_state)
+    problem = Knight(init_state)  ###### define goal ##########
 
     # example of bfs graph search
     startTime = time.perf_counter()
@@ -76,17 +114,15 @@ for instance in instances:
     for n in path:
         print(n.state)  # assuming that the __str__ function of state outputs the correct format
         print()
-    print("nb nodes explored = ",nbExploredNodes)
+    print("nb nodes explored = ", nbExploredNodes)
     print("time : " + str(endTime - startTime))
-
-
-
+"""
 ####################################
 # Launch the search for INGInious  #
 ####################################
-#Use this block to test your code on INGInious
-shape = (int(sys.argv[1]),int(sys.argv[2]))
-init_pos = (int(sys.argv[3]),int(sys.argv[4]))
+# Use this block to test your code on INGInious
+shape = (int(sys.argv[1]), int(sys.argv[2]))
+init_pos = (int(sys.argv[3]), int(sys.argv[4]))
 init_state = State(shape, init_pos)
 
 problem = Knight(init_state)
@@ -104,5 +140,6 @@ print('Number of moves: ' + str(node.depth))
 for n in path:
     print(n.state)  # assuming that the __str__ function of state outputs the correct format
     print()
-print("nb nodes explored = ",nbExploredNodes)
+print("nb nodes explored = ", nbExploredNodes)
 print("time : " + str(endTime - startTime))
+"""
