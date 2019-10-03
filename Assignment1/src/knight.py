@@ -12,9 +12,10 @@ class Knight(Problem):
 
     def successor(self, state):
         (x, y) = state.get_white()
-        for (nx, ny) in self.get_successor(x, y):
-            if self.valid_successor(nx, ny, state):
-                yield ((nx, ny), self.new_state(nx, ny, state, x, y))
+        l = self.get_successor(x, y, state)
+        l.sort(key=lambda t: -len(self.get_successor(t[0], t[1], state)))
+        for (nx, ny) in l:
+            yield ((nx, ny), self.new_state(nx, ny, state, x, y))
 
     def goal_test(self, state):
         for i in state.grid:
@@ -22,9 +23,21 @@ class Knight(Problem):
                 return False
         return True
 
-    def get_successor(self, x, y):
-        return [(x + 2, y - 1), (x + 2, y + 1), (x + 1, y + 2), (x - 1, y + 2), (x - 2, y + 1), (x - 2, y - 1),
-                (x - 1, y - 2), (x + 1, y - 2)]
+    def get_successor(self, x, y, state):
+        p = ((1, -2), (-2, -1), (-1, 2), (-2, 1), (-1, -2), (1, 2), (2, 1), (2, -1))
+        #return [(x + 2, y - 1), (x + 2, y + 1), (x + 1, y + 2), (x - 1, y + 2), (x - 2, y + 1), (x - 2, y - 1),
+        #        (x - 1, y - 2), (x + 1, y - 2)]
+        return [(x+i, y+j) for (i,j) in p if 0 <= x+i < state.nRows and 0 <= y+j < state.nCols and state.grid[x+i][y+j] == " "]
+        #return [(x+1, y-2), (x-2, y-1), (x-1, y + 2), (x-2, y+1), (x-1, y-2), (x+1, y+2), (x+2, y+1), (x+2, -1)]
+
+    def key_sort_successors(self, him, other, state):
+        """
+        A comparator using the number of successors of the node
+        :param him: of the form (x, y) for the positions of him
+        :param other: of the form (x, y) for the positions of him
+        :return: 1, -1 or 0
+        """
+        return len(self.get_successor(him[0], him[1], state)) - len(self.get_successor(other[0], other[1], state))
 
     def valid_successor(self, x, y, state):
         return 0 <= x < state.nRows and 0 <= y < state.nCols and state.grid[x][y] == " "
@@ -104,7 +117,7 @@ for instance in instances:
 
     # example of bfs graph search
     startTime = time.perf_counter()
-    node, nbExploredNodes = iterative_deepening_search(problem)
+    node, nbExploredNodes = depth_first_graph_search(problem)
     endTime = time.perf_counter()
 
     # example of print
@@ -117,7 +130,7 @@ for instance in instances:
         print()
     print("nb nodes explored = ", nbExploredNodes)
     print("time : " + str(endTime - startTime))
-    break
+
 """
 ####################################
 # Launch the search for INGInious  #
@@ -131,7 +144,7 @@ problem = Knight(init_state)
 
 # example of bfs graph search
 startTime = time.perf_counter()
-node, nbExploredNodes = depth_first_tree_search(problem)
+node, nbExploredNodes = depth_first_graph_search(problem)
 endTime = time.perf_counter()
 
 # example of print
@@ -144,4 +157,4 @@ for n in path:
     print()
 print("nb nodes explored = ", nbExploredNodes)
 print("time : " + str(endTime - startTime))
-"""""
+"""
