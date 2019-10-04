@@ -1,7 +1,9 @@
 # -*-coding: utf-8 -*
 '''NAMES OF THE AUTHOR(S): Gael Aglin <gael.aglin@uclouvain.be>'''
+'''NAMES OF THE STUDENTS: 
+Edgar Gevorgyan <edgar.gevorgyan@student.uclouvain.be>
+Louis Navarre <navarre.louis@student.uclouvain.be>'''
 import time
-import sys
 from search import *
 
 
