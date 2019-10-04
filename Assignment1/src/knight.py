@@ -11,6 +11,17 @@ from search import *
 class Knight(Problem):
 
     def successor(self, state):
+        """
+        Extends the method of the class Problem.
+        The successors are computed as follow: given a state, we compute all the possible
+        moves from the current position of the knight, and check if the successor is in a valid
+        position.
+        The successors are inversely proportionally to the number of valid positions when the
+        knight is at that position. It is the Warnsdorff's rule
+        :param state: the state of the current node, to be expanded
+        :return: yields all the valid successors of the node with the state 'state', according to
+                 the Warnsdorff's rule.
+        """
         (x, y) = state.get_white()
         l = self.get_successor(x, y, state)
         l.sort(key=lambda t: -len(self.get_successor(t[0], t[1], state)))
@@ -18,6 +29,12 @@ class Knight(Problem):
             yield ((nx, ny), self.new_state(nx, ny, state, x, y))
 
     def goal_test(self, state):
+        """
+        Extends the method of the class Problem.
+        We have reached the goal if there isn't any white square on the board
+        :param state: the state of the node to be checked
+        :return: true if the goal is reached, false otherwise
+        """
         for i in state.grid:
             if " " in i:
                 return False
