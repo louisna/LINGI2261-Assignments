@@ -42,10 +42,7 @@ class Knight(Problem):
 
     def get_successor(self, x, y, state):
         p = ((1, -2), (-2, -1), (-1, 2), (-2, 1), (-1, -2), (1, 2), (2, 1), (2, -1))
-        #return [(x + 2, y - 1), (x + 2, y + 1), (x + 1, y + 2), (x - 1, y + 2), (x - 2, y + 1), (x - 2, y - 1),
-        #        (x - 1, y - 2), (x + 1, y - 2)]
         return [(x+i, y+j) for (i,j) in p if 0 <= x+i < state.nRows and 0 <= y+j < state.nCols and state.grid[x+i][y+j] == " "]
-        #return [(x+1, y-2), (x-2, y-1), (x-1, y + 2), (x-2, y+1), (x-1, y-2), (x+1, y+2), (x+2, y+1), (x+2, -1)]
 
     def key_sort_successors(self, him, other, state):
         """
@@ -55,9 +52,6 @@ class Knight(Problem):
         :return: 1, -1 or 0
         """
         return len(self.get_successor(him[0], him[1], state)) - len(self.get_successor(other[0], other[1], state))
-
-    def valid_successor(self, x, y, state):
-        return 0 <= x < state.nRows and 0 <= y < state.nCols and state.grid[x][y] == " "
 
     def new_state(self, x, y, state, old_x, old_y):
         tmp = State([state.nCols, state.nRows], (x, y),0)
