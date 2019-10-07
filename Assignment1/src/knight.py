@@ -171,32 +171,58 @@ class State:
 ##############################
 # Use this block to test your code in local
 # Comment it and uncomment the next one if you want to submit your code on INGInious
+
+def which_function(i, problem):
+    if i == 0:
+        return depth_first_graph_search(problem)
+    elif i == 1:
+        return depth_first_tree_search(problem)
+    elif i == 2:
+        return breadth_first_graph_search(problem)
+    else:
+        return breadth_first_tree_search(problem)
+
+
+times = []
+nodes = []
+
 with open('instances.txt') as f:
     instances = f.read().splitlines()
+for i in range(4):
+    algo_time = []
+    algo_nodes = []
+    for instance in instances:
+        elts = instance.split(" ")
+        shape = (int(elts[0]), int(elts[1]))
+        init_pos = (int(elts[2]), int(elts[3]))
+        init_state = State(shape, init_pos)
 
-for instance in instances:
-    elts = instance.split(" ")
-    shape = (int(elts[0]), int(elts[1]))
-    init_pos = (int(elts[2]), int(elts[3]))
-    init_state = State(shape, init_pos)
+        problem = Knight(init_state)
 
-    problem = Knight(init_state)
+        # example of bfs graph search
+        startTime = time.perf_counter()
+        node, nbExploredNodes = which_function(i, problem)
+        endTime = time.perf_counter()
 
-    # example of bfs graph search
-    startTime = time.perf_counter()
-    node, nbExploredNodes = depth_first_graph_search(problem)
-    endTime = time.perf_counter()
+        # example of print
+        path = node.path()
+        path.reverse()
 
-    # example of print
-    path = node.path()
-    path.reverse()
+        algo_nodes.append(node.depth)
+        algo_time.append(endTime - startTime)
 
-    print('Number of moves: ' + str(node.depth))
-    for n in path:
-        print(n.state)  # assuming that the __str__ function of state outputs the correct format
-        print()
-    print("nb nodes explored = ", nbExploredNodes)
-    print("time : " + str(endTime - startTime))
+        print('Number of moves: ' + str(node.depth))
+        #for n in path:
+        #    print(n.state)  # assuming that the __str__ function of state outputs the correct format
+        #    print()
+        print("nb nodes explored = ", nbExploredNodes)
+        print("time : " + str(endTime - startTime))
+    times.append(algo_time)
+    nodes.append(algo_nodes)
+
+for i in range(10):
+    print(times[0][i], times[1][i], times[2][i], times[3][i])
+
 
 """
 ####################################
