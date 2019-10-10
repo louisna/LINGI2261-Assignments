@@ -13,7 +13,10 @@ class Pacmen(Problem):
         pass
 
     def goal_test(self, state):
-        pass
+        for i in state.grid:
+            if "@" in i:
+                return False
+        return True
 
 
 ###############
@@ -40,10 +43,10 @@ class State:
         return s
 
     def __eq__(self, other_state):
-        pass
+        return self.grid == other.grid
 
     def __hash__(self):
-        pass
+        return hash(tuple(map(tuple, self.grid)))
 
 
 
