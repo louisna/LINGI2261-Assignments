@@ -171,7 +171,7 @@ class State:
 ##############################
 # Use this block to test your code in local
 # Comment it and uncomment the next one if you want to submit your code on INGInious
-
+"""
 def which_function(i, problem):
     if i == 0:
         return depth_first_graph_search(problem)
@@ -250,4 +250,4 @@ for n in path:
     print()
 print("nb nodes explored = ", nbExploredNodes)
 print("time : " + str(endTime - startTime))
-"""
+
