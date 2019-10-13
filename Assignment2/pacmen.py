@@ -18,15 +18,32 @@ class Pacmen(Problem):
                 return False
         return True
 
+    def path_cost(self, c, state1, action, state2):
+        """Return the cost of a solution path that arrives at state2 from
+        state1 via action, assuming cost c to get up to state1. If the problem
+        is such that the path doesn't matter, this function will only look at
+        state2.  If the path does matter, it will consider c and maybe state1
+        and action. The default method costs 1 for every step in the path."""
+        return c + 1  # recal avec le nombre de pacmen ayant bougé
+
 
 ###############
 # State class #
 ###############
 class State:
+
     def __init__(self, grid):
         self.nbr = len(grid)
         self.nbc = len(grid[0])
         self.grid = grid
+        self.pacmenPos = []  # list des pacmen
+        self.food = []  # list de la nourriture restante
+        for x in range(self.nbr):
+            for y in range(self.nbc):
+                if grid[x][y] == "$":
+                    self.pacmenPos.append((x, y))
+                elif grid[x][y] == "@":
+                    self.food.append((x, y))
 
     def __str__(self):
         nsharp = self.nbc * 2 + 3
@@ -43,11 +60,10 @@ class State:
         return s
 
     def __eq__(self, other_state):
-        return self.grid == other.grid
+        return self.grid == other_state.grid
 
     def __hash__(self):
         return hash(tuple(map(tuple, self.grid)))
-
 
 
 ######################
@@ -82,7 +98,7 @@ init_state = State(grid_init)
 problem = Pacmen(init_state)
 
 startTime = time.perf_counter()
-node, nbExploredNodes = astar_graph_search(problem,heuristic)
+node, nbExploredNodes = astar_graph_search(problem, heuristic)
 endTime = time.perf_counter()
 
 # example of print
@@ -94,5 +110,5 @@ for n in path:
     print(n.state)  # assuming that the __str__ function of state outputs the correct format
     print()
 
-print("nb nodes explored = ",nb)
+print("nb nodes explored = ", nbExploredNodes)
 print("time : " + str(endTime - startTime))
