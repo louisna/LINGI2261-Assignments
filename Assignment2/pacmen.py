@@ -33,7 +33,7 @@ class Pacmen(Problem):
                 nx, ny = x+ax, y+ay
                 if (x,y) not in new_positions:
                     grid[x][y] = " "
-                if (nx, ny) in new_positions or (nx, ny) in state.pacmenPos:
+                if (nx, ny) in new_positions :# or (nx, ny) in state.pacmenPos:
                     boo = False
                     break
                 else:
