@@ -10,8 +10,9 @@ import itertools
 #################
 class Pacmen(Problem):
 
+
     def successor(self, state):
-        goto = [(0,0), (1,1),(-1,1),(-1,-1),(1,-1)]
+        goto = [(0,0), (1,0),(-1,0),(0,1),(0,-1)]
         li = []
         for xp,yp in state.pacmenPos :
             lp = []
@@ -23,7 +24,41 @@ class Pacmen(Problem):
         l = tuple([(0, 0) for i in range(len(state.pacmenPos))])
         prod.remove(l)
         for act in prod :
-            grid = state.grid
+            boo = True
+            new_positions = []
+            grid = [x[:] for x in state.grid]
+            for i in range(len(state.pacmenPos)):
+                x,y = state.pacmenPos[i]
+                ax,ay = act[i]
+                nx, ny = x+ax, y+ay
+                if (x,y) not in new_positions:
+                    grid[x][y] = " "
+                if (nx, ny) in new_positions: #or (nx, ny) in state.pacmenPos:
+                    boo = False
+                    break
+                else:
+                    new_positions.append((nx, ny))
+                grid[nx][ny] = "$"
+            if boo:
+                new_state = State(grid)
+                yield (act, new_state)
+
+    """
+    def successor(self, state):
+        goto = [ (1, 0), (-1, 0), (0, -1), (0, -1)]
+        l = []
+        for x, y in goto:
+            if self.validePos(state, (x+state.pacmenPos[0][0], y+state.pacmenPos[0][1])):
+                l.append((x,y))
+        for x,y in l:
+            grid = [i[:] for i in state.grid]
+            grid[state.pacmenPos[0][0]][state.pacmenPos[0][1]] = " "
+            grid[x+state.pacmenPos[0][0]][y+state.pacmenPos[0][1]] = "$"
+            news = State(grid)
+            yield  ((x,y), news)
+    """
+
+
 
 
 
@@ -43,7 +78,8 @@ class Pacmen(Problem):
         is such that the path doesn't matter, this function will only look at
         state2.  If the path does matter, it will consider c and maybe state1
         and action. The default method costs 1 for every step in the path."""
-        return c + 1  # recal avec le nombre de pacmen ayant bougé
+        return c + len(action) - list(action).count((0,0))
+        #return c + 1  # recal avec le nombre de pacmen ayant bougé
 
 
 ###############
@@ -103,10 +139,14 @@ def readInstanceFile(filename):
 def heuristic(node):
     if len(node.state.food) == 0:
         return 0
-    distM = 0.0
+    distMM = 0
     for (x,y) in node.state.pacmenPos:
+        l = []
+        distMin = 99999999999
         for (xf,yf) in node.state.food:
-            distM = abs(x-xf) + abs(y-yf)
+            if distMin > abs(x-xf) + abs(y-yf):
+                distMin = abs(x-xf) + abs(y-yf)
+                
     return distM
 
 
@@ -115,6 +155,7 @@ def heuristic(node):
 #####################
 grid_init = readInstanceFile(sys.argv[1])
 init_state = State(grid_init)
+#print(init_state)
 
 problem = Pacmen(init_state)
 
