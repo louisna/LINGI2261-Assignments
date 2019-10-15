@@ -2,6 +2,7 @@
 '''NAMES OF THE AUTHOR(S): Gael Aglin <gael.aglin@uclouvain.be>'''
 import time
 from search import *
+import itertools
 
 
 #################
@@ -10,7 +11,25 @@ from search import *
 class Pacmen(Problem):
 
     def successor(self, state):
-        pass
+        goto = [(0,0), (1,1),(-1,1),(-1,-1),(1,-1)]
+        li = []
+        for xp,yp in state.pacmenPos :
+            lp = []
+            for x,y in goto:
+                if self.validePos(state, (xp + x, yp + y)):
+                    lp.append((x, y))
+            li.append(lp)
+        prod = list(itertools.product(*li))
+        l = tuple([(0, 0) for i in range(len(state.pacmenPos))])
+        prod.remove(l)
+        for act in prod :
+            grid = state.grid
+
+
+
+    def validePos(self, state, pos):
+        (x,y) = pos
+        return 0 <= x < state.nbr and 0 <= y < state.nbc and state.grid[x][y] != "x"
 
     def goal_test(self, state):
         for i in state.grid:
@@ -82,11 +101,13 @@ def readInstanceFile(filename):
 # Heuristic function #
 ######################
 def heuristic(node):
-    h = 0.0
-    # ...
-    # compute an heuristic value
-    # ...
-    return h
+    if len(node.state.food) == 0:
+        return 0
+    distM = 0.0
+    for (x,y) in node.state.pacmenPos:
+        for (xf,yf) in node.state.food:
+            distM = abs(x-xf) + abs(y-yf)
+    return distM
 
 
 #####################
