@@ -33,7 +33,7 @@ class Pacmen(Problem):
                 nx, ny = x+ax, y+ay
                 if (x,y) not in new_positions:
                     grid[x][y] = " "
-                if (nx, ny) in new_positions: #or (nx, ny) in state.pacmenPos:
+                if (nx, ny) in new_positions or (nx, ny) in state.pacmenPos:
                     boo = False
                     break
                 else:
@@ -141,13 +141,13 @@ def heuristic(node):
         return 0
     distMM = 0
     for (x,y) in node.state.pacmenPos:
-        l = []
-        distMin = 99999999999
+        distMin = 999999999999999
         for (xf,yf) in node.state.food:
             if distMin > abs(x-xf) + abs(y-yf):
                 distMin = abs(x-xf) + abs(y-yf)
-                
-    return distM
+        distMM += distMin
+
+    return distMM
 
 
 #####################
