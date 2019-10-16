@@ -10,20 +10,19 @@ import itertools
 #################
 class Pacmen(Problem):
 
-
     def successor(self, state):
-        goto = [(0,0), (1,0),(-1,0),(0,1),(0,-1)]
+        goto = [(1, 0), (-1, 0), (0, 1), (0, -1)]
         li = []
-        for xp,yp in state.pacmenPos :
+        for xp, yp in state.pacmenPos:
             lp = []
-            for x,y in goto:
+            for x, y in goto:
                 if self.validePos(state, (xp + x, yp + y)):
                     lp.append((x, y))
             li.append(lp)
         prod = list(itertools.product(*li))
-        l = tuple([(0, 0) for i in range(len(state.pacmenPos))])
-        prod.remove(l)
-        for act in prod :
+        #l = tuple([(0, 0) for i in range(len(state.pacmenPos))])
+        #prod.remove(l)
+        for act in prod:
             boo = True
             new_positions = []
             grid = [x[:] for x in state.grid]
@@ -31,7 +30,7 @@ class Pacmen(Problem):
                 x,y = state.pacmenPos[i]
                 ax,ay = act[i]
                 nx, ny = x+ax, y+ay
-                if (x,y) not in new_positions:
+                if (x, y) not in new_positions:
                     grid[x][y] = " "
                 if (nx, ny) in new_positions :# or (nx, ny) in state.pacmenPos:
                     boo = False
@@ -58,10 +57,6 @@ class Pacmen(Problem):
             yield  ((x,y), news)
     """
 
-
-
-
-
     def validePos(self, state, pos):
         (x,y) = pos
         return 0 <= x < state.nbr and 0 <= y < state.nbc and state.grid[x][y] != "x"
@@ -72,22 +67,19 @@ class Pacmen(Problem):
                 return False
         return True
 
-    """
     def path_cost(self, c, state1, action, state2):
-        """"""Return the cost of a solution path that arrives at state2 from
+        """Return the cost of a solution path that arrives at state2 from
         state1 via action, assuming cost c to get up to state1. If the problem
         is such that the path doesn't matter, this function will only look at
         state2.  If the path does matter, it will consider c and maybe state1
-        and action. The default method costs 1 for every step in the path.""""""
-        return c + len(action) - list(action).count((0,0))
-        #return c + 1  # recal avec le nombre de pacmen ayant bougé
-        """
-
-
+        and action. The default method costs 1 for every step in the path."""
+        return c + len(action) - list(action).count((0, 0))
+        # return c + 1  # recal avec le nombre de pacmen ayant bougé
 
 ###############
 # State class #
 ###############
+
 class State:
 
     def __init__(self, grid):
@@ -143,9 +135,9 @@ def heuristic(node):
     if len(node.state.food) == 0:
         return 0
     distMM = 0
-    for (x, y) in node.state.pacmenPos:
+    for (xf, yf) in node.state.food:
         distMin = 999999999999999
-        for (xf, yf) in node.state.food:
+        for (x, y) in node.state.pacmenPos:
             if distMin > abs(x-xf) + abs(y-yf):
                 distMin = abs(x-xf) + abs(y-yf)
         distMM += distMin
