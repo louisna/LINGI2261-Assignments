@@ -11,11 +11,11 @@ import itertools
 class Pacmen(Problem):
 
     def successor(self, state):
-        goto = [(1, 0), (-1, 0), (0, 1), (0, -1), (0, 0)]
+        goto = [(1, 0), (-1, 0), (0, 1), (0, -1)]
         li = [[(x, y) for (x, y) in goto if self.validePos(state, (xp + x, yp + y))] for (xp, yp) in state.pacmenPos]
         prod = list(itertools.product(*li))
-        l = tuple([(0, 0) for i in range(len(state.pacmenPos))])
-        prod.remove(l)
+        #l = tuple([(0, 0) for i in range(len(state.pacmenPos))])
+        #prod.remove(l)
         for act in prod:
             boo = True
             new_positions = []
@@ -67,8 +67,8 @@ class Pacmen(Problem):
         is such that the path doesn't matter, this function will only look at
         state2.  If the path does matter, it will consider c and maybe state1
         and action. The default method costs 1 for every step in the path."""
-        #return c + len(action) - list(action).count((0, 0)) + 1
-        return c + 1  # recal avec le nombre de pacmen ayant bougé
+        return c + len(action) - list(action).count((0, 0))
+        # return c + 1  # recal avec le nombre de pacmen ayant bougé
 
 ###############
 # State class #
@@ -125,7 +125,7 @@ def readInstanceFile(filename):
 ######################
 # Heuristic function #
 ######################
-def heuristic_2(node):
+def heuristic(node):
     if len(node.state.food) == 0:
         return 0
     distMM = 0
@@ -134,7 +134,7 @@ def heuristic_2(node):
         for (x, y) in node.state.pacmenPos:
             if distMin > abs(x-xf) + abs(y-yf):
                 distMin = abs(x-xf) + abs(y-yf)
-        distMM = max(distMM, distMin)
+        distMM += distMin
 
     return distMM
 
@@ -142,11 +142,11 @@ def validePos(state, pos, map):
     (x,y) = pos
     return 0 <= x < state.nbr and 0 <= y < state.nbc and map[x][y] != "x"
 
-def heuristic(node):
+def heuristic_2(node):
     food = node.state.food
     if len(food) == 0:
         return 0
-    q = FIFOQueue()
+    q = []
     for i in node.state.pacmenPos:
         q.append((i, 0))
 
@@ -155,65 +155,17 @@ def heuristic(node):
 
     total = 0
 
-    while len(q) > 0:
+    while not len(q) == 0:
         ((x, y), cost) = q.pop()
         for (a, b) in moves:
             if validePos(node.state, (x+a, y+b), map):
                 if map[x+a][y+b] == "@":
-                    total = max(total,cost)
+                    total += cost
                 map[x+a][y+b] = "x"
                 q.append(((x+a, y+b), cost+1))
     return total
 
-from collections import deque
 
-class Queue():
-    '''
-    Thread-safe, memory-efficient, maximally-sized queue supporting queueing and
-    dequeueing in worst-case O(1) time.
-    '''
-
-
-    def __init__(self, max_size = 100000):
-        '''
-        Initialize this queue to the empty queue.
-
-        Parameters
-        ----------
-        max_size : int
-            Maximum number of items contained in this queue. Defaults to 10.
-        '''
-
-        self._queue = deque(maxlen=max_size)
-        self.size = 0
-
-
-    def enqueue(self, item):
-        '''
-        Queues the passed item (i.e., pushes this item onto the tail of this
-        queue).
-
-        If this queue is already full, the item at the head of this queue
-        is silently removed from this queue *before* the passed item is
-        queued.
-        '''
-
-        self._queue.append(item)
-        self.size += 1
-
-
-    def dequeue(self):
-        '''
-        Dequeues (i.e., removes) the item at the head of this queue *and*
-        returns this item.
-
-        Raises
-        ----------
-        IndexError
-            If this queue is empty.
-        '''
-        self.size -= 1
-        return self._queue.pop()
 
 #####################
 # Launch the search #
