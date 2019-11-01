@@ -292,7 +292,8 @@ init_state = State(grid_init)
 problem = Pacmen(init_state)
 
 startTime = time.perf_counter()
-node, nbExploredNodes = astar_graph_search(problem, heuristic)
+#node, nbExploredNodes = astar_graph_search(problem, heuristic)
+node, nbExploredNodes = breadth_first_graph_search(problem)
 endTime = time.perf_counter()
 
 # example of print
