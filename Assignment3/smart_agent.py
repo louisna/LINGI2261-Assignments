@@ -15,6 +15,12 @@ class MyAgent(AlphaBetaAgent):
     def get_action(self, state, last_action, time_left):
         self.last_action = last_action
         self.time_left = time_left
+        self.count = 0
+        for pawn in range(5):
+            if state.is_pawn_finished(self.id,pawn):
+                self.count += 1
+            if state.is_pawn_finished(1-self.id,pawn):
+                self.count += 1
         return minimax.search(state, self)
 
     """
@@ -36,7 +42,7 @@ class MyAgent(AlphaBetaAgent):
     def cutoff(self, state, depth):
         if state.game_over_check():
             return True
-        return depth >= 7  # arbitrary set max depth to 1
+        return depth >= 5 + self.count # arbitrary set max depth to 1
 
     """
     The evaluate function must return an integer value
@@ -46,9 +52,9 @@ class MyAgent(AlphaBetaAgent):
         sum = 0
         count = 0
         if state.game_over_check() and state.get_winner() == self.id :
-            return 100000000000000000000
+            return 10000000000000000
         elif state.game_over_check() and state.get_winner() == 1- self.id :
-            return -100000000000000000000
+            return -10000000000000000
         for pawn in range(5):
             if state.is_pawn_returning(self.id,pawn):
                 count += 1
@@ -61,25 +67,25 @@ class MyAgent(AlphaBetaAgent):
 
 
             if state.is_pawn_finished(self.id,pawn):
-                sum += 1000
+                sum += 2000
                 
-
+            
             new_state2 = state.copy()
             new_state2.move_1(1-self.id, pawn)
             if new_state2.check_crossings(1-self.id,pawn):
-                #print("not cross-------------------------")
-                sum -= 500
+                sum -= 1000
 
 
             sum += (state.get_pawn_advancement(self.id, pawn) - state.get_pawn_advancement(1-self.id, pawn)) * 100
 
-            
+            """
             safe = True
             for adv in range(5): # for each of the opponent's pawns
                 if state.get_pawn_advancement(1-self.id, adv) < 7 + pawn: ### see if it works
                     safe = False
             if safe:
                 sum += 100
+            """
         if count == 4 : 
             sum += 1000
 
