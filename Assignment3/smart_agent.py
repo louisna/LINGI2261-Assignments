@@ -1,0 +1,87 @@
+from agent import AlphaBetaAgent
+import minimax
+import squadro_state
+
+"""
+Agent skeleton. Fill in the gaps.
+"""
+
+
+class MyAgent(AlphaBetaAgent):
+
+    """
+    This is the skeleton of an agent to play the Squadro game.
+    """
+    def get_action(self, state, last_action, time_left):
+        self.last_action = last_action
+        self.time_left = time_left
+        self.depth = 1
+        return minimax.search(state, self)
+
+    """
+    The successors function must return (or yield) a list of
+    pairs (a, s) in which a is the action played to reach the
+    state s.
+    """
+    def successors(self, state):
+        actions = state.get_current_player_actions()
+        for a in actions:
+            new_state = state.copy()
+            new_state.apply_action(a)
+            yield a, new_state
+
+    """
+    The cutoff function returns true if the alpha-beta/minimax
+    search has to stop and false otherwise.
+    """
+    def cutoff(self, state, depth):
+        if state.game_over_check():
+            return True
+        return depth >= 1  # arbitrary set max depth to 1
+
+    """
+    The evaluate function must return an integer value
+    representing the utility function of the board.
+    """
+    def evaluate(self, state):
+        sum = 0
+        count = 0
+        for pawn in range(5):
+            if state.is_pawn_returning(self.id,pawn):
+                count += 1
+        if count == 4 : 
+            sum += 1000
+        if state.game_over_check() and state.get_winner() == self.id :
+            return 100000000000000000000
+        elif state.game_over_check() and state.get_winner() == 1- self.id :
+            return -100000000000000000000
+        for pawn in range(5):
+            if state.is_pawn_returning(self.id, pawn):
+                sum += 10*squadro_state.MOVES_RETURN[self.id][pawn]
+            else:
+                sum += 10*(4-squadro_state.MOVES[self.id][pawn])
+        """
+        for pawn in range(5):
+            new_state = state.copy()
+            if new_state.check_crossings(self.id,pawn):
+                print("crosse")
+                sum += 100
+            new_state2 = state.copy()
+            if new_state2.check_crossings(1-self.id,pawn):
+                print("not cross")
+                sum -= 200
+        """
+        for pawn in range(5):  # they are 5 pawn
+            sum += (state.get_pawn_advancement(self.id, pawn) - state.get_pawn_advancement(1-self.id, pawn)) * 100
+        
+        for pawn in range(5): # for each of my pawns
+            safe = True
+            for adv in range(5): # for each of the opponent's pawns
+                if state.get_pawn_advancement(1-self.id, adv) <= 7 + pawn:
+                    safe = False
+            if safe:
+                print("ewaaaaaaaaa")
+                sum += 100
+                        
+        
+        return sum
