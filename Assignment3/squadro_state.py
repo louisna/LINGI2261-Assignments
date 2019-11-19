@@ -25,6 +25,15 @@ class SquadroState(State):
     # Have the pawns completed their journey ?
     self.finished = [[False, False, False, False, False], [False, False, False, False, False]]
 
+  def __str__(self):
+    s = ""
+    for i in range(5):
+      s += str(self.get_pawn_advancement(0, i)) + " "
+    s += "\n"
+    for i in range(5):
+      s += str(self.get_pawn_advancement(1, i)) + " "
+    s += "\n\n\n"
+    return s
 
   def __eq__(self, other):
     return self.cur_player == other.cur_player and self.cur_pos == other.cur_pos
