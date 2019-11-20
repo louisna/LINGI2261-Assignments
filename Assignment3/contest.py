@@ -77,6 +77,23 @@ class MyAgent(AlphaBetaAgent):
                         speed = squadro_state.MOVES[self.id][pawn]
                     sum -= round((advancement % 6)/speed)
 
+            if pawn > 0:
+                friend = pawn - 1
+                if state.is_pawn_returning(self.id, pawn) != state.is_pawn_returning(self.id, friend):
+                    if 7 <= state.get_pawn_advancement(self.id, pawn) + state.get_pawn_advancement(self.id, friend) <= 9:
+                        sum += 3
+                else:
+                    if state.get_pawn_advancement(self.id, pawn) - state.get_pawn_advancement(self.id, friend) <= 2:
+                        sum += 3
+            if pawn < 4:
+                friend = pawn + 1
+                if state.is_pawn_returning(self.id, pawn) != state.is_pawn_returning(self.id, friend):
+                    if 7 <= state.get_pawn_advancement(self.id, pawn) + state.get_pawn_advancement(self.id, friend) <= 9:
+                        sum += 3
+                else:
+                    if state.get_pawn_advancement(self.id, pawn) - state.get_pawn_advancement(self.id, friend) <= 2:
+                        sum += 3
+
             sum += (state.get_pawn_advancement(self.id, pawn) - state.get_pawn_advancement(1-self.id, pawn)) * 2
 
         if count == 4:
