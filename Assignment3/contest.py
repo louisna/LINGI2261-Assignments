@@ -42,7 +42,7 @@ class MyAgent(AlphaBetaAgent):
     def cutoff(self, state, depth):
         if state.game_over_check():
             return True
-        return depth >= 5 + self.count # arbitrary set max depth to 1
+        return depth >= 7 + self.count # arbitrary set max depth to 1
 
     """
     The evaluate function must return an integer value
@@ -63,7 +63,7 @@ class MyAgent(AlphaBetaAgent):
                 sum += squadro_state.MOVES_RETURN[self.id][pawn]
 
             if state.is_pawn_finished(self.id, pawn):
-                sum += 5
+                sum += 8
 
             new_state2 = state.copy()
             new_state2.cur_player = 1-self.id
