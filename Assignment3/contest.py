@@ -42,7 +42,7 @@ class MyAgent(AlphaBetaAgent):
     def cutoff(self, state, depth):
         if state.game_over_check():
             return True
-        return depth >= 7 + self.count # arbitrary set max depth to 1
+        return depth >= 5 + self.count # arbitrary set max depth to 1
 
     """
     The evaluate function must return an integer value
@@ -114,5 +114,119 @@ class MyAgent(AlphaBetaAgent):
                     else:
                         speed = squadro_state.MOVES[1-self.id][pawn]
                     sum += round((advancement % 6) / speed)
+
+        
+        if self.id == 0: #yellow
+            if state.is_pawn_returning(self.id,1):
+                if state.get_pawn_advancement(self.id,1) == 6 and (state.get_pawn_advancement(1-self.id,0)==7 or 1 <= state.get_pawn_advancement(1-self.id,0)<4):
+                    safe = False
+                elif state.get_pawn_advancement(self.id,1) == 7 and (state.get_pawn_advancement(1-self.id,1)==6 or state.get_pawn_advancement(1-self.id,1)==3):
+                    safe = False
+                elif state.get_pawn_advancement(self.id,1) == 8 and (state.get_pawn_advancement(1-self.id,2)==6 or 2 <= state.get_pawn_advancement(1-self.id,2)<4):
+                    safe = False
+                elif state.get_pawn_advancement(self.id,1) == 9 and (state.get_pawn_advancement(1-self.id,3)==6 or state.get_pawn_advancement(1-self.id,3)==3):
+                    safe = False
+                elif state.get_pawn_advancement(self.id,1) == 10 and (state.get_pawn_advancement(1-self.id,4)==7 or 1 <= state.get_pawn_advancement(1-self.id,4)<4):
+                    safe = False
+                if safe:
+                    sum += (state.get_pawn_advancement(self.id,1)%6)*2
+            if state.is_pawn_returning(self.id,3):
+                if state.get_pawn_advancement(self.id,3) == 6 and (state.get_pawn_advancement(1-self.id,0)==0 or state.get_pawn_advancement(1-self.id,0)==9):
+                    safe = False
+                elif state.get_pawn_advancement(self.id,3) == 7 and (state.get_pawn_advancement(1-self.id,1)==1 or 7 <= state.get_pawn_advancement(1-self.id,1)<10):
+                    safe = False
+                elif state.get_pawn_advancement(self.id,3) == 8 and (state.get_pawn_advancement(1-self.id,2)==0 or 8 <= state.get_pawn_advancement(1-self.id,2)<10):
+                    safe = False
+                elif state.get_pawn_advancement(self.id,3) == 9 and (state.get_pawn_advancement(1-self.id,3)==1 or 7 <= state.get_pawn_advancement(1-self.id,3)<10):
+                    safe = False
+                elif state.get_pawn_advancement(self.id,3) == 10 and (state.get_pawn_advancement(1-self.id,4)==0 or state.get_pawn_advancement(1-self.id,4)==9):
+                    safe = False
+                if safe:
+                    sum += (state.get_pawn_advancement(self.id,3)%6)*2
+            if not state.is_pawn_returning(self.id,0):#left pawn
+                safe = True
+                if state.get_pawn_advancement(self.id,0) == 0 and (2 <= state.get_pawn_advancement(1-self.id,0)<5 or state.get_pawn_advancement(1-self.id,0)==6):
+                    safe = False
+                elif state.get_pawn_advancement(self.id,0) == 1 and (state.get_pawn_advancement(1-self.id,1)==4 or state.get_pawn_advancement(1-self.id,1)==6):
+                    safe = False  
+                elif state.get_pawn_advancement(self.id,0) == 2 and (3 <= state.get_pawn_advancement(1-self.id,2)<5 or state.get_pawn_advancement(1-self.id,2)==6):
+                    safe = False  
+                elif state.get_pawn_advancement(self.id,0) == 3 and (state.get_pawn_advancement(1-self.id,3)==4 or state.get_pawn_advancement(1-self.id,3)==6):
+                    safe = False 
+                elif state.get_pawn_advancement(self.id,0) == 4 and (2 <= state.get_pawn_advancement(1-self.id,4)<5 or state.get_pawn_advancement(1-self.id,4)==6):
+                    safe = False
+                if safe:
+                    sum += (state.get_pawn_advancement(self.id,0)%6)*2
+            if not state.is_pawn_finished(self.id,4):#right pawn
+                safe = True
+                if state.get_pawn_advancement(self.id,4) == 0 and (state.get_pawn_advancement(1-self.id,0) == 10 or state.get_pawn_advancement(1-self.id,0)==0):
+                    safe = False
+                elif state.get_pawn_advancement(self.id,4) == 1 and (8 <= state.get_pawn_advancement(1-self.id,1)<11 or state.get_pawn_advancement(1-self.id,1)==0):
+                    safe = False
+                elif state.get_pawn_advancement(self.id,4) == 2 and (9 <= state.get_pawn_advancement(1-self.id,2)<11 or state.get_pawn_advancement(1-self.id,2)==0):
+                    safe = False  
+                elif state.get_pawn_advancement(self.id,4) == 3 and (8 <= state.get_pawn_advancement(1-self.id,3)<11 or state.get_pawn_advancement(1-self.id,3)==0):
+                    safe = False
+                elif state.get_pawn_advancement(self.id,4) == 4 and (state.get_pawn_advancement(1-self.id,4) == 10 or state.get_pawn_advancement(1-self.id,4)==0):
+                    safe = False
+                if safe:
+                    sum += (state.get_pawn_advancement(self.id,4)%6)*2
+        else: #red
+            if state.is_pawn_returning(self.id,4):#bottom pawn
+                safe = True
+                if state.get_pawn_advancement(self.id,4) == 6 and (8 <= state.get_pawn_advancement(1-self.id,0)<11  or state.get_pawn_advancement(1-self.id,0)==0):
+                    safe = False
+                elif state.get_pawn_advancement(self.id,4) == 7 and (state.get_pawn_advancement(1-self.id,1) == 10 or state.get_pawn_advancement(1-self.id,1)==0):
+                    safe = False
+                elif state.get_pawn_advancement(self.id,4) == 8 and (9 <= state.get_pawn_advancement(1-self.id,2)<11 or state.get_pawn_advancement(1-self.id,2)==0):
+                    safe = False  
+                elif state.get_pawn_advancement(self.id,4) == 9 and (state.get_pawn_advancement(1-self.id,3) == 10 or state.get_pawn_advancement(1-self.id,3)==0):
+                    safe = False
+                elif state.get_pawn_advancement(self.id,4) == 10 and (8 <= state.get_pawn_advancement(1-self.id,4)<11 or state.get_pawn_advancement(1-self.id,4)==0):
+                    safe = False
+                if safe:
+                    sum += (state.get_pawn_advancement(self.id,4)%6)*2
+            if state.is_pawn_returning(self.id,0):#toppest pawn
+                safe = True
+                if state.get_pawn_advancement(self.id,0) == 6 and (state.get_pawn_advancement(1-self.id,0)==4 or state.get_pawn_advancement(1-self.id,0)==6):
+                    safe = False
+                elif state.get_pawn_advancement(self.id,0) == 7 and (2 <= state.get_pawn_advancement(1-self.id,1)<5 or state.get_pawn_advancement(1-self.id,1)==6):
+                    safe = False  
+                elif state.get_pawn_advancement(self.id,0) == 8 and (3 <= state.get_pawn_advancement(1-self.id,2)<5 or state.get_pawn_advancement(1-self.id,2)==6):
+                    safe = False  
+                elif state.get_pawn_advancement(self.id,0) == 9 and (2 <= state.get_pawn_advancement(1-self.id,3)<5 or state.get_pawn_advancement(1-self.id,3)==6):
+                    safe = False 
+                elif state.get_pawn_advancement(self.id,0) == 10 and (state.get_pawn_advancement(1-self.id,4)==4 or state.get_pawn_advancement(1-self.id,4)==6):
+                    safe = False
+                if safe:
+                    sum += (state.get_pawn_advancement(self.id,0)%6)*2
+            if not state.is_pawn_returning(self.id,1):
+                safe = True
+                if state.get_pawn_advancement(self.id,1) == 0 and (state.get_pawn_advancement(1-self.id,4)==6 or state.get_pawn_advancement(1-self.id,4)==3):
+                    safe = False
+                elif state.get_pawn_advancement(self.id,1) == 1 and (state.get_pawn_advancement(1-self.id,3)==7 or 1 <= state.get_pawn_advancement(1-self.id,3)<4):
+                    safe = False
+                elif state.get_pawn_advancement(self.id,1) == 2 and (state.get_pawn_advancement(1-self.id,2)==6 or 2 <= state.get_pawn_advancement(1-self.id,2)<4):
+                    safe = False
+                elif state.get_pawn_advancement(self.id,1) == 3 and (state.get_pawn_advancement(1-self.id,1)==7 or 1 <= state.get_pawn_advancement(1-self.id,1)<4):
+                    safe = False
+                elif state.get_pawn_advancement(self.id,1) == 4 and (state.get_pawn_advancement(1-self.id,0)==6 or state.get_pawn_advancement(1-self.id,0)==3):
+                    safe = False
+                if safe:
+                    sum += (state.get_pawn_advancement(self.id,1)%6)*2
+            if not state.is_pawn_finished(self.id,3):
+                safe = True
+                if state.get_pawn_advancement(self.id,3) == 0 and (state.get_pawn_advancement(1-self.id,4)==1 or 7 <= state.get_pawn_advancement(1-self.id,4)<10):
+                    safe = False
+                elif state.get_pawn_advancement(self.id,3) == 1 and (state.get_pawn_advancement(1-self.id,3)==0 or state.get_pawn_advancement(1-self.id,3)==9):
+                    safe = False
+                elif state.get_pawn_advancement(self.id,3) == 2 and (state.get_pawn_advancement(1-self.id,2)==0 or 8 <= state.get_pawn_advancement(1-self.id,2)<10):
+                    safe = False
+                elif state.get_pawn_advancement(self.id,3) == 3 and (state.get_pawn_advancement(1-self.id,1)==0 or state.get_pawn_advancement(1-self.id,1)==9):
+                    safe = False
+                elif state.get_pawn_advancement(self.id,3) == 4 and (state.get_pawn_advancement(1-self.id,0)==1 or 7 <= state.get_pawn_advancement(1-self.id,0)<10):
+                    safe = False
+                if safe:
+                    sum += (state.get_pawn_advancement(self.id,3)%6)*2
 
         return sum

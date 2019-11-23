@@ -42,7 +42,7 @@ class MyAgent(AlphaBetaAgent):
     def cutoff(self, state, depth):
         if state.game_over_check():
             return True
-        return depth >= 7 + self.count # arbitrary set max depth to 1
+        return depth >= 5 + self.count # arbitrary set max depth to 1
 
     """
     The evaluate function must return an integer value
