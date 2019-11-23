@@ -42,7 +42,7 @@ class MyAgent(AlphaBetaAgent):
     def cutoff(self, state, depth):
         if state.game_over_check():
             return True
-        return depth >= 5 + self.count # arbitrary set max depth to 1
+        return depth >= 7 + self.count # arbitrary set max depth to 1
 
     """
     The evaluate function must return an integer value
@@ -50,20 +50,17 @@ class MyAgent(AlphaBetaAgent):
     """
     def evaluate(self, state):
         sum = 0
-        count = 0
         if state.game_over_check() and state.get_winner() == self.id:
             return 1000000
         elif state.game_over_check() and state.get_winner() == 1 - self.id:
             return -1000000
         for pawn in range(5):
-            if state.is_pawn_returning(self.id, pawn):
-                count += 1
 
             if state.is_pawn_returning(self.id, pawn):
                 sum += squadro_state.MOVES_RETURN[self.id][pawn]
 
             if state.is_pawn_finished(self.id, pawn):
-                sum += 8
+                sum += 10
 
             new_state2 = state.copy()
             new_state2.cur_player = 1-self.id
@@ -75,29 +72,36 @@ class MyAgent(AlphaBetaAgent):
                         speed = squadro_state.MOVES_RETURN[self.id][pawn]
                     else:
                         speed = squadro_state.MOVES[self.id][pawn]
-                    sum -= round((advancement % 6)/speed)
+                    sum -= (round((advancement % 6)/speed) + 1)
 
             if pawn > 0:
                 friend = pawn - 1
-                if state.is_pawn_returning(self.id, pawn) != state.is_pawn_returning(self.id, friend):
-                    if 7 <= state.get_pawn_advancement(self.id, pawn) + state.get_pawn_advancement(self.id, friend) <= 9:
-                        sum += 3
-                else:
-                    if state.get_pawn_advancement(self.id, pawn) - state.get_pawn_advancement(self.id, friend) <= 2:
-                        sum += 3
+                if state.get_pawn_advancement(self.id, pawn) != 12 and state.get_pawn_advancement(self.id,
+                                                                                                  friend) != 12:
+                    if state.is_pawn_returning(self.id, pawn) != state.is_pawn_returning(self.id, friend):
+                        if 7 <= state.get_pawn_advancement(self.id, pawn) + state.get_pawn_advancement(self.id, friend) <= 9:
+                            sum += 3
+                    else:
+                        if state.get_pawn_advancement(self.id, pawn) - state.get_pawn_advancement(self.id, friend) <= 2:
+                            sum += 3
             if pawn < 4:
                 friend = pawn + 1
-                if state.is_pawn_returning(self.id, pawn) != state.is_pawn_returning(self.id, friend):
-                    if 7 <= state.get_pawn_advancement(self.id, pawn) + state.get_pawn_advancement(self.id, friend) <= 9:
-                        sum += 3
-                else:
-                    if state.get_pawn_advancement(self.id, pawn) - state.get_pawn_advancement(self.id, friend) <= 2:
-                        sum += 3
+                if state.get_pawn_advancement(self.id, pawn) != 12 and state.get_pawn_advancement(self.id, friend) != 12:
+                    if state.is_pawn_returning(self.id, pawn) != state.is_pawn_returning(self.id, friend):
+                        if 7 <= state.get_pawn_advancement(self.id, pawn) + state.get_pawn_advancement(self.id, friend) <= 9:
+                            sum += 3
+                    else:
+                        if state.get_pawn_advancement(self.id, pawn) - state.get_pawn_advancement(self.id, friend) <= 2:
+                            sum += 3
 
-            sum += (state.get_pawn_advancement(self.id, pawn) - state.get_pawn_advancement(1-self.id, pawn)) * 2
+            safe = True
+            for adv in range(5):  # for each of the opponent's pawns
+                if state.get_pawn_advancement(1 - self.id, adv) <= 7 + pawn:
+                    safe = False
+            if safe:
+                sum += 6
 
-        if count == 4:
-            sum += 5
+            sum += (state.get_pawn_advancement(self.id, pawn) - state.get_pawn_advancement(1-self.id, pawn)) * 3
 
         state_copy = state.copy()
         state_copy.cur_player = 1 - self.id
