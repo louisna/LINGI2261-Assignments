@@ -60,8 +60,8 @@ class MyAgent(AlphaBetaAgent):
         if state.game_over_check():
             return True
         time_now = time()
-        #return time_now - self.time_begin_research >= self.time_left_that_research
-        return depth >= 5 + self.count  # arbitrary set max depth to 1
+        return time_now - self.time_begin_research >= self.time_left_that_research
+        #return depth >= 5 + self.count  # arbitrary set max depth to 1
 
     """
     The evaluate function must return an integer value
@@ -322,7 +322,6 @@ class MyAgent(AlphaBetaAgent):
 
                 else:
                     crossed = True
-                    print("passage", total)
                     total += 1
                     state.move_1(0, pawn)
                     state.return_init(1, opponent_pawn)
