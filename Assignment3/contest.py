@@ -189,38 +189,38 @@ class MyAgent(AlphaBetaAgent):
             if not state.is_pawn_returning(self.id, 0):  # left pawn
                 safe = True
                 if state.get_pawn_advancement(self.id, 0) == 0 and (
-                        2 <= state.get_pawn_advancement(1, 0) < 5 or state.get_pawn_advancement(1, 0) == 6):
+                        2 <= state.get_pawn_advancement(1, 0) < 5 or state.get_pawn_advancement(1, 4) == 6):
                     safe = False
                 elif state.get_pawn_advancement(self.id, 0) == 1 and (
-                        state.get_pawn_advancement(1, 1) == 4 or state.get_pawn_advancement(1, 1) == 6):
+                        state.get_pawn_advancement(1, 1) == 4 or state.get_pawn_advancement(1, 3) == 6):
                     safe = False
                 elif state.get_pawn_advancement(self.id, 0) == 2 and (
                         3 <= state.get_pawn_advancement(1, 2) < 5 or state.get_pawn_advancement(1, 2) == 6):
                     safe = False
                 elif state.get_pawn_advancement(self.id, 0) == 3 and (
-                        state.get_pawn_advancement(1, 3) == 4 or state.get_pawn_advancement(1, 3) == 6):
+                        state.get_pawn_advancement(1, 3) == 4 or state.get_pawn_advancement(1, 1) == 6):
                     safe = False
                 elif state.get_pawn_advancement(self.id, 0) == 4 and (
-                        2 <= state.get_pawn_advancement(1, 4) < 5 or state.get_pawn_advancement(1, 4) == 6):
+                        2 <= state.get_pawn_advancement(1, 4) < 5 or state.get_pawn_advancement(1, 0) == 6):
                     safe = False
                 if safe:
                     evaluation += (state.get_pawn_advancement(self.id, 0) % 6) * 2
-            if not state.is_pawn_finished(self.id, 4):  # right pawn
+            if not state.is_pawn_returning(self.id, 4):  # right pawn
                 safe = True
                 if state.get_pawn_advancement(self.id, 4) == 0 and (
-                        state.get_pawn_advancement(1, 0) == 10 or state.get_pawn_advancement(1, 0) == 0):
+                        state.get_pawn_advancement(1, 0) == 10 or state.get_pawn_advancement(1, 4) == 0):
                     safe = False
                 elif state.get_pawn_advancement(self.id, 4) == 1 and (
-                        8 <= state.get_pawn_advancement(1, 1) < 11 or state.get_pawn_advancement(1, 1) == 0):
+                        8 <= state.get_pawn_advancement(1, 1) < 11 or state.get_pawn_advancement(1, 3) == 0):
                     safe = False
                 elif state.get_pawn_advancement(self.id, 4) == 2 and (
                         9 <= state.get_pawn_advancement(1, 2) < 11 or state.get_pawn_advancement(1, 2) == 0):
                     safe = False
                 elif state.get_pawn_advancement(self.id, 4) == 3 and (
-                        8 <= state.get_pawn_advancement(1, 3) < 11 or state.get_pawn_advancement(1, 3) == 0):
+                        8 <= state.get_pawn_advancement(1, 3) < 11 or state.get_pawn_advancement(1, 1) == 0):
                     safe = False
                 elif state.get_pawn_advancement(self.id, 4) == 4 and (
-                        state.get_pawn_advancement(1, 4) == 10 or state.get_pawn_advancement(1, 4) == 0):
+                        state.get_pawn_advancement(1, 4) == 10 or state.get_pawn_advancement(1, 0) == 0):
                     safe = False
                 if safe:
                     evaluation += (state.get_pawn_advancement(self.id, 4) % 6) * 2
@@ -282,7 +282,7 @@ class MyAgent(AlphaBetaAgent):
                     safe = False
                 if safe:
                     evaluation += (state.get_pawn_advancement(self.id, 1) % 6) * 2
-            if not state.is_pawn_finished(self.id, 3):
+            if not state.is_pawn_returning(self.id, 3):
                 safe = True
                 if state.get_pawn_advancement(self.id, 3) == 0 and (
                         state.get_pawn_advancement(0, 4) == 1 or 7 <= state.get_pawn_advancement(0, 4) < 10):
