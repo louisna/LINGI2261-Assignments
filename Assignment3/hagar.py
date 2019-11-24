@@ -118,6 +118,7 @@ class MyAgent(AlphaBetaAgent):
         
         if self.id == 0: #yellow
             if state.is_pawn_returning(self.id,1):
+                safe = True
                 if state.get_pawn_advancement(self.id,1) == 6 and (state.get_pawn_advancement(1-self.id,0)==7 or 1 <= state.get_pawn_advancement(1-self.id,0)<4):
                     safe = False
                 elif state.get_pawn_advancement(self.id,1) == 7 and (state.get_pawn_advancement(1-self.id,1)==6 or state.get_pawn_advancement(1-self.id,1)==3):
@@ -131,6 +132,7 @@ class MyAgent(AlphaBetaAgent):
                 if safe:
                     sum += (state.get_pawn_advancement(self.id,1)%6)*2
             if state.is_pawn_returning(self.id,3):
+                safe = True
                 if state.get_pawn_advancement(self.id,3) == 6 and (state.get_pawn_advancement(1-self.id,0)==0 or state.get_pawn_advancement(1-self.id,0)==9):
                     safe = False
                 elif state.get_pawn_advancement(self.id,3) == 7 and (state.get_pawn_advancement(1-self.id,1)==1 or 7 <= state.get_pawn_advancement(1-self.id,1)<10):
