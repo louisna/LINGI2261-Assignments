@@ -1,6 +1,8 @@
 from agent import AlphaBetaAgent
 import minimax
 import squadro_state
+from time import time
+from math import ceil
 
 """
 Agent skeleton. Fill in the gaps.
@@ -17,6 +19,18 @@ class MyAgent(AlphaBetaAgent):
         self.last_action = last_action
         self.time_left = time_left
         self.count = 0
+        number_of_moves_left = 0
+        for i in range(5):
+            if state.is_pawn_finished(self.id, i):
+                continue
+            if state.is_pawn_returning(self.id, i):  # Returing path for the pawn
+                number_of_moves_left += ceil((12 - state.get_pawn_advancement(self.id, i)) / squadro_state.MOVES_RETURN[self.id][i])
+            else:
+                number_of_moves_left += ceil((6 - state.get_pawn_advancement(self.id, i))/ squadro_state.MOVES[self.id][i])
+                number_of_moves_left += ceil(6 / squadro_state.MOVES_RETURN[self.id][i])
+        number_of_moves_left *= 1.2
+        self.time_left_that_research = self.time_left / number_of_moves_left
+        self.time_begin_research = time()
         for pawn in range(5):
             if state.is_pawn_finished(self.id, pawn):
                 self.count += 1
@@ -45,7 +59,9 @@ class MyAgent(AlphaBetaAgent):
     def cutoff(self, state, depth):
         if state.game_over_check():
             return True
-        return depth >= 5 + self.count  # arbitrary set max depth to 1
+        time_now = time()
+        return time_now - self.time_begin_research >= self.time_left_that_research
+        #return depth >= 5 + self.count  # arbitrary set max depth to 1
 
     """
     The evaluate function must return an integer value
