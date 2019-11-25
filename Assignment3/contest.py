@@ -19,6 +19,7 @@ class MyAgent(AlphaBetaAgent):
         self.last_action = last_action
         self.time_left = time_left
         self.count = 0
+        self.threshold = 0
         number_of_moves_left = 0
         for i in range(5):
             if state.is_pawn_finished(self.id, i):
@@ -28,7 +29,7 @@ class MyAgent(AlphaBetaAgent):
             else:
                 number_of_moves_left += ceil((6 - state.get_pawn_advancement(self.id, i))/ squadro_state.MOVES[self.id][i])
                 number_of_moves_left += ceil(6 / squadro_state.MOVES_RETURN[self.id][i])
-        number_of_moves_left *= 1.2
+        number_of_moves_left *= 2.0 #1.2
         self.time_left_that_research = self.time_left / number_of_moves_left
         self.time_begin_research = time()
         for pawn in range(5):
@@ -36,7 +37,12 @@ class MyAgent(AlphaBetaAgent):
                 self.count += 1
             if state.is_pawn_finished(1 - self.id, pawn):
                 self.count += 1
-        return minimax.search(state, self)
+        
+        tmp = 0
+        while time() - self.time_begin_research <= self.time_left_that_research:
+            self.threshold += 1
+            tmp = minimax.search(state, self)
+        return tmp
 
     """
     The successors function must return (or yield) a list of
@@ -57,11 +63,10 @@ class MyAgent(AlphaBetaAgent):
     """
 
     def cutoff(self, state, depth):
+        print(self.threshold)
         if state.game_over_check():
             return True
-        time_now = time()
-        return time_now - self.time_begin_research >= self.time_left_that_research
-        #return depth >= 5 + self.count  # arbitrary set max depth to 1
+        return depth >= self.threshold
 
     """
     The evaluate function must return an integer value
