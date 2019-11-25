@@ -20,6 +20,11 @@ class MyAgent(AlphaBetaAgent):
         self.time_left = time_left
         self.count = 0
         self.threshold = 0
+
+        # If we have enough time, we start the threshold at a 'high' value: 5
+        if self.time_left > 450: # Half the time
+            self.threshold = 5
+
         number_of_moves_left = 0
         for i in range(5):
             if state.is_pawn_finished(self.id, i):
@@ -29,7 +34,7 @@ class MyAgent(AlphaBetaAgent):
             else:
                 number_of_moves_left += ceil((6 - state.get_pawn_advancement(self.id, i))/ squadro_state.MOVES[self.id][i])
                 number_of_moves_left += ceil(6 / squadro_state.MOVES_RETURN[self.id][i])
-        number_of_moves_left *= 1.2
+        number_of_moves_left *= 3
         self.time_left_that_research = self.time_left / number_of_moves_left
         self.time_begin_research = time()
         for pawn in range(5):
@@ -39,9 +44,19 @@ class MyAgent(AlphaBetaAgent):
                 self.count += 1
         
         tmp = 0
-        while time() - self.time_begin_research <= self.time_left_that_research:
+        best = None
+        while time() - self.time_begin_research < self.time_left_that_research / 1.5:
             self.threshold += 1
-            tmp = minimax.search(state, self)
+            print('threshold', self.threshold)
+            value, tmp, best = minimax.search(state, self)
+            print('value', value)
+            print('Future actions')
+            cur = self.id
+            for i in best:
+                print(cur, i)
+                cur = 1 - cur
+            print('---')
+        print('\n')
         return tmp
 
     """
@@ -63,10 +78,9 @@ class MyAgent(AlphaBetaAgent):
     """
 
     def cutoff(self, state, depth):
-        print(self.threshold)
         if state.game_over_check():
             return True
-        return depth >= self.threshold or time() - self.time_begin_research > self.time_left_that_research
+        return depth >= self.threshold
 
     """
     The evaluate function must return an integer value
@@ -84,7 +98,7 @@ class MyAgent(AlphaBetaAgent):
             return -1000000
         # The following tests are done for each pawn
         for pawn in range(5):
-            # Check the number of returning pawns
+            # Count the total number of returning/finishing pawns
             if state.is_pawn_returning(self.id, pawn) or state.is_pawn_finished(self.id, pawn):
                 count += 1
             # Good if the pawn is at the returning process
@@ -95,11 +109,11 @@ class MyAgent(AlphaBetaAgent):
                 evaluation += 12
 
             # Check if the opponent can eat the pawn at his next move -> subtract points
+            # We make a copy of the state to be sure that we don't modify it with the tests
             new_state2 = state.copy()
             new_state2.cur_player = 1 - self.id
             if new_state2.is_action_valid(pawn):
-                new_state2.move_1(1 - self.id, pawn)
-                crossed, total = self.check_crossings_evaluation(1 - self.id, pawn, new_state2)
+                crossed, total = self.apply_action_evaluation(pawn, new_state2)
                 if crossed:
                     advancement = new_state2.get_pawn_advancement(self.id, pawn)
                     if new_state2.is_pawn_returning(self.id, pawn):
@@ -142,16 +156,16 @@ class MyAgent(AlphaBetaAgent):
         for action in adv_actions:
             state_intern = state_copy.copy()
             state_intern.apply_action(action)
+            state_intern.cur_player = self.id # Should be useless, just to be sure
             for pawn in range(5):
-                state_intern.move_1(self.id, pawn)
-                crossed, total = self.check_crossings_evaluation(self.id, pawn, state_intern)
+                crossed, total = self.apply_action_evaluation(action, state_intern)
                 if crossed:
                     advancement = state_intern.get_pawn_advancement(self.id, pawn)
                     if state_intern.is_pawn_returning(1 - self.id, pawn):
                         speed = squadro_state.MOVES_RETURN[1 - self.id][pawn]
                     else:
                         speed = squadro_state.MOVES[1 - self.id][pawn]
-                    evaluation += round((advancement % 6) / speed) * total
+                    evaluation += round((advancement % 6) / speed) * total * 2
 
         # Brute check to see if the pawn is safe to move
         if self.id == 0:  # Yellow
@@ -173,7 +187,7 @@ class MyAgent(AlphaBetaAgent):
                         state.get_pawn_advancement(1, 4) == 7 or 1 <= state.get_pawn_advancement(1, 4) < 4):
                     safe = False
                 if safe:
-                    evaluation += (state.get_pawn_advancement(self.id, 1) % 6)
+                    evaluation += (state.get_pawn_advancement(self.id, 1) % 6) * 1.5
             if state.is_pawn_returning(self.id, 3):
                 safe = True
                 if state.get_pawn_advancement(self.id, 3) == 6 and (
@@ -192,7 +206,7 @@ class MyAgent(AlphaBetaAgent):
                         state.get_pawn_advancement(1, 4) == 0 or state.get_pawn_advancement(1, 4) == 9):
                     safe = False
                 if safe:
-                    evaluation += (state.get_pawn_advancement(self.id, 3) % 6)
+                    evaluation += (state.get_pawn_advancement(self.id, 3) % 6) * 1.5
             if not state.is_pawn_returning(self.id, 0):  # left pawn
                 safe = True
                 if state.get_pawn_advancement(self.id, 0) == 0 and (
@@ -211,7 +225,7 @@ class MyAgent(AlphaBetaAgent):
                         2 <= state.get_pawn_advancement(1, 0) < 5 or state.get_pawn_advancement(1, 0) == 6):
                     safe = False
                 if safe:
-                    evaluation += (state.get_pawn_advancement(self.id, 0) % 6)
+                    evaluation += (state.get_pawn_advancement(self.id, 0) % 6) * 1.5
             if not state.is_pawn_returning(self.id, 4):  # right pawn
                 safe = True
                 if state.get_pawn_advancement(self.id, 4) == 0 and (
@@ -230,7 +244,7 @@ class MyAgent(AlphaBetaAgent):
                         state.get_pawn_advancement(1, 0) == 10 or state.get_pawn_advancement(1, 0) == 0):
                     safe = False
                 if safe:
-                    evaluation += (state.get_pawn_advancement(self.id, 4) % 6)
+                    evaluation += (state.get_pawn_advancement(self.id, 4) % 6) * 1.5
         else:  # red
             if state.is_pawn_returning(self.id, 4):  # bottom pawn
                 safe = True
@@ -250,7 +264,7 @@ class MyAgent(AlphaBetaAgent):
                         8 <= state.get_pawn_advancement(0, 4) < 11 or state.get_pawn_advancement(0, 4) == 0):
                     safe = False
                 if safe:
-                    evaluation += (state.get_pawn_advancement(self.id, 4) % 6)
+                    evaluation += (state.get_pawn_advancement(self.id, 4) % 6) * 1.5
             if state.is_pawn_returning(self.id, 0):  # toppest pawn
                 safe = True
                 if state.get_pawn_advancement(self.id, 0) == 6 and (
@@ -269,7 +283,7 @@ class MyAgent(AlphaBetaAgent):
                         state.get_pawn_advancement(0, 4) == 4 or state.get_pawn_advancement(0, 4) == 6):
                     safe = False
                 if safe:
-                    evaluation += (state.get_pawn_advancement(self.id, 0) % 6)
+                    evaluation += (state.get_pawn_advancement(self.id, 0) % 6) * 1.5
             if not state.is_pawn_returning(self.id, 1):
                 safe = True
                 if state.get_pawn_advancement(self.id, 1) == 0 and (
@@ -288,7 +302,7 @@ class MyAgent(AlphaBetaAgent):
                         state.get_pawn_advancement(0, 0) == 6 or state.get_pawn_advancement(0, 0) == 3):
                     safe = False
                 if safe:
-                    evaluation += (state.get_pawn_advancement(self.id, 1) % 6)
+                    evaluation += (state.get_pawn_advancement(self.id, 1) % 6) * 1.5
             if not state.is_pawn_returning(self.id, 3):
                 safe = True
                 if state.get_pawn_advancement(self.id, 3) == 0 and (
@@ -307,9 +321,32 @@ class MyAgent(AlphaBetaAgent):
                         state.get_pawn_advancement(0, 0) == 1 or 7 <= state.get_pawn_advancement(0, 0) < 10):
                     safe = False
                 if safe:
-                    evaluation += (state.get_pawn_advancement(self.id, 3) % 6)
+                    evaluation += (state.get_pawn_advancement(self.id, 3) % 6) * 1.5
 
         return evaluation
+
+    def apply_action_evaluation(self, action, state):
+        if not state.returning[state.cur_player][action]:
+            n_moves = squadro_state.MOVES[state.cur_player][action]
+        else:
+            n_moves = squadro_state.MOVES_RETURN[state.cur_player][action]
+
+        total_crossed = 0
+        crossed = False
+
+        for i in range(n_moves):
+            ret_before = state.returning[state.cur_player][action]
+            state.move_1(state.cur_player, action)
+
+            if state.returning[state.cur_player][action] != ret_before:
+                break
+            if state.finished[state.cur_player][action]:
+                break
+            crossed, how_much = self.check_crossings_evaluation(state.cur_player, action, state)
+            if crossed:
+                total_crossed += how_much
+                break
+        return crossed, total_crossed
 
     def check_crossings_evaluation(self, player, pawn, state):
         ended = False

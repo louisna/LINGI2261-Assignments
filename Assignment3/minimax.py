@@ -60,5 +60,43 @@ def search(state, player, prune=True):
                     beta = min(beta, v)
         return val, action
 
-    _, action = max_value(state, -inf, inf, 0)
-    return action
+    def max_value_check(state, alpha, beta, depth):
+        if player.cutoff(state, depth):
+            return player.evaluate(state), None, None
+        val = -inf
+        action = None
+        best = []
+        for a, s in player.successors(state):
+            v, _, best_local = min_value_check(s, alpha, beta, depth + 1)
+            if v > val:
+                val = v
+                action = a
+                best = [] if best_local is None else best_local
+                if prune:
+                    if v >= beta:
+                        return v, a, [a] + [best]
+                    alpha = max(alpha, v)
+        best = [action] + best
+        return val, action, best
+
+    def min_value_check(state, alpha, beta, depth):
+        if player.cutoff(state, depth):
+            return player.evaluate(state), None, None
+        val = inf
+        action = None
+        bestt = []
+        for a, s in player.successors(state):
+            v, _, best_local = max_value_check(s, alpha, beta, depth + 1)
+            if v < val:
+                val = v
+                action = a
+                bestt = [] if best_local is None else best_local
+                if prune:
+                    if v <= alpha:
+                        return v, a, [a] + [bestt]
+                    beta = min(beta, v)
+        bestt = [action] + bestt
+        return val, action, bestt
+
+    value, action, best = max_value_check(state, -inf, inf, 0)
+    return value, action, best
