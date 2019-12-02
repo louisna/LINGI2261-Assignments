@@ -28,7 +28,6 @@ class BinPacking(Problem):
                                 del newstate.bins[i]
                             #print(len(newstate.bins))
                             yield (item, j), newstate
-
         # Second method using swap
         for i, binA in enumerate(state.bins):
             for j, binB in enumerate(state.bins):
@@ -45,7 +44,6 @@ class BinPacking(Problem):
                                     #print('test debut', new_state.bins[i].keys(), itemA)
                                     #print("swap", new_state.bins)
                                     yield None, new_state
-
 
     def fitness(self, state):
         """
@@ -66,41 +64,26 @@ class BinPacking(Problem):
 
 class State:
 
-    def __init__(self, capacity, items, generate=True):
+    def __init__(self, capacity, items):
         self.capacity = capacity
         self.items = items
-        if generate:
-            self.bins = self.build_init()
+        self.bins = self.build_init()
     
     def copy_state(self):
-        new_state = State(self.capacity, self.items.copy(), generate=False)
+        new_state = State(self.capacity, self.items.copy())
         new_state.bins = [bin.copy() for bin in self.bins]
         return new_state
 
     # an init state building is provided here but you can change it at will
-
     def build_init(self):
         init = []
         for ind, size in self.items.items():
-            if len(init) == 0:
+            if len(init) == 0 or not self.can_fit(init[-1], size):
                 init.append({ind: size})
             else:
-                fitted = False
-                for i, bin in enumerate(init):
-                    if self.can_fit(bin, size):
-                        init[i][ind] = size
-                        fitted = True
-                if not fitted:
-                    init.append({ind: size})
+                if self.can_fit(init[-1], size):
+                    init[-1][ind] = size
         return init
-    """
-
-    def build_init(self):
-        init = []
-        for ind, size in self.items.items():
-            init.append({ind: size})
-        return init
-    """
 
     def can_fit(self, bin, itemsize):
         return sum(list(bin.values())) + itemsize <= self.capacity
@@ -126,8 +109,6 @@ def read_instance(instanceFile):
 def maxvalue(problem, limit=100, callback=None):
     current = LSNode(problem, problem.initial, 0)
     best = current
-    bestv = problem.fitness(best.state)
-    hm = {}
 
     for step in range(limit):
         if callback is not None:
@@ -143,9 +124,7 @@ def maxvalue(problem, limit=100, callback=None):
             if value < best_value:
                 best_next = next
                 best_value = value
-        if bestv > best_value:
-            best = best_next
-            bestv = best_value
+        best = best_next
     return best
 
 # Attention : Depending of the objective function you use, your goal can be to maximize or to minimize it
@@ -160,6 +139,7 @@ def randomized_maxvalue(problem, limit=100, callback=None):
         possible_moves = list(best.expand())
         five_best = [(math.inf, None)] * 5
         if possible_moves is None or len(possible_moves) == 0:
+            #print("ONLY ONE")
             return best
         for next in possible_moves:
             value = problem.fitness(next.state)
@@ -179,12 +159,13 @@ if __name__ == '__main__':
     init_state = State(info[0], info[1])
     bp_problem = BinPacking(init_state)
     bp_problem.successor(init_state)
-    step_limit = 300
+    step_limit = 100
     #node = randomized_maxvalue(bp_problem, step_limit)
     node = maxvalue(bp_problem, step_limit)
     state = node.state
     #print(bp_problem.fitness(state))
     print(state)
+    #print(init_state)
     #sum = 0
     #print(maxvalue(bp_problem).state)
     #print(randomized_maxvalue(bp_problem).state)
