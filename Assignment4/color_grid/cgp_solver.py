@@ -19,6 +19,55 @@ Read the comment on top of clause.py to see how this works.
 def get_expression(size, points=None):
     expression = []
     # your code here
+    for i in range(size):
+        for j in range(size):
+            for k in range(size):
+                for runner in range(size):
+                    # First: add clauses for the row
+                    if runner != i:
+                        clause_row = Clause(size)
+                        clause_row.add_negative(i, j, k)
+                        clause_row.add_negative(runner, j, k)
+                        expression.append(clause_row)
+                    # Second: add clauses for the column
+                    if runner != j:
+                        clause_column = Clause(size)
+                        clause_column.add_negative(i, j, k)
+                        clause_column.add_negative(i, runner, k)
+                        expression.append(clause_column)
+                # For up
+                for runner in range(size):
+                    if i - runner < 0 or j - runner < 0:
+                        break
+                    clause_diag_1_up = Clause(size)
+                    clause_diag_1_up.add_negative(i, j, k)
+                    clause_diag_1_up.add_negative(i-runner, j-runner, k)
+                    expression.append(clause_diag_1_up)
+                # For down
+                for runner in range(size):
+                    if i + runner <= size or j + runner <= size:
+                        break
+                    clause_diag_1_up = Clause(size)
+                    clause_diag_1_up.add_negative(i, j, k)
+                    clause_diag_1_up.add_negative(i + runner, j + runner, k)
+                    expression.append(clause_diag_1_up)
+
+                # For up
+                for runner in range(size):
+                    if i - runner < 0 or j + runner >= size:
+                        break
+                    clause_diag_1_up = Clause(size)
+                    clause_diag_1_up.add_negative(i, j, k)
+                    clause_diag_1_up.add_negative(i-runner, j+runner, k)
+                    expression.append(clause_diag_1_up)
+                # For down
+                for runner in range(size):
+                    if i + runner <= size or j - runner < 0:
+                        break
+                    clause_diag_1_up = Clause(size)
+                    clause_diag_1_up.add_negative(i, j, k)
+                    clause_diag_1_up.add_negative(i + runner, j - runner, k)
+                    expression.append(clause_diag_1_up)
     return expression
 
 
