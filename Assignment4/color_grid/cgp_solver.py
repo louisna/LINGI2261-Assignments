@@ -72,6 +72,9 @@ def get_expression(size, points=None):
 
 
 if __name__ == '__main__':
-    expression = get_expression(3)
-    for clause in expression:
-        print(clause)
+    #expression = get_expression(3)
+    #for clause in expression:
+    #    print(clause)
+    clause = Clause(3)
+    clause.add_negative(1, 1, 2)
+    print(clause)
