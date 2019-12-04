@@ -61,6 +61,7 @@ if __name__ == "__main__":
     expression = get_expression(size, points)
     nb_vars = n_rows * n_columns * n_colors
     solution = minisat.minisat(nb_vars, [clause.minisat_str() for clause in expression], './minisatMac')
+
     if solution is None:
         print("The problem is unfeasible")
         exit(0)
@@ -94,8 +95,6 @@ if __name__ == "__main__":
                 clean = False
                 print("FAIL. Right diagonal passing through cell ({0},{1}) is not different.".format(i, j))
     for point in points:
-        print(point)
-        print(grid)
         if grid[point[0]][point[1]] != point[2]:
             clean = False
             print("FAIL. Point ({0},{1}) is not equal to {2} as required".format(point[0], point[1], point[2]))

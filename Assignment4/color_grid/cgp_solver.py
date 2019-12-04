@@ -21,7 +21,10 @@ def get_expression(size, points=None):
     # your code here
     for i in range(size):
         for j in range(size):
+            a = [item for item in points if item[0] == i and item[1] == j]
             for k in range(size):
+                if len(a) > 0 and a[0][2] != k:
+                    continue
                 for runner in range(size):
                     # First: add clauses for the row
                     if runner != i:
@@ -35,8 +38,14 @@ def get_expression(size, points=None):
                         clause_column.add_negative(i, j, k)
                         clause_column.add_negative(i, runner, k)
                         expression.append(clause_column)
+    for i in range(size):
+        for j in range(size):
+            a = [item for item in points if item[0] == i and item[1] == j]
+            for k in range(size):
+                if len(a) > 0 and a[0][2] != k:
+                    continue
                 # For up
-                for runner in range(size):
+                for runner in range(1, size):
                     if i - runner < 0 or j - runner < 0:
                         break
                     clause_diag_1_up = Clause(size)
@@ -44,8 +53,8 @@ def get_expression(size, points=None):
                     clause_diag_1_up.add_negative(i-runner, j-runner, k)
                     expression.append(clause_diag_1_up)
                 # For down
-                for runner in range(size):
-                    if i + runner <= size or j + runner <= size:
+                for runner in range(1, size):
+                    if i + runner >= size or j + runner >= size:
                         break
                     clause_diag_1_up = Clause(size)
                     clause_diag_1_up.add_negative(i, j, k)
@@ -53,7 +62,7 @@ def get_expression(size, points=None):
                     expression.append(clause_diag_1_up)
 
                 # For up
-                for runner in range(size):
+                for runner in range(1, size):
                     if i - runner < 0 or j + runner >= size:
                         break
                     clause_diag_1_up = Clause(size)
@@ -61,8 +70,8 @@ def get_expression(size, points=None):
                     clause_diag_1_up.add_negative(i-runner, j+runner, k)
                     expression.append(clause_diag_1_up)
                 # For down
-                for runner in range(size):
-                    if i + runner <= size or j - runner < 0:
+                for runner in range(1, size):
+                    if i + runner >= size or j - runner < 0:
                         break
                     clause_diag_1_up = Clause(size)
                     clause_diag_1_up.add_negative(i, j, k)
@@ -72,9 +81,6 @@ def get_expression(size, points=None):
 
 
 if __name__ == '__main__':
-    #expression = get_expression(3)
-    #for clause in expression:
-    #    print(clause)
-    clause = Clause(3)
-    clause.add_negative(1, 1, 2)
-    print(clause)
+    expression = get_expression(3, [(0, 0, 0)])
+    for clause in expression:
+        print(clause)
