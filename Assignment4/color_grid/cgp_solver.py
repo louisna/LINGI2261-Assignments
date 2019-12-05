@@ -18,13 +18,10 @@ Read the comment on top of clause.py to see how this works.
 
 def get_expression(size, points=None):
     expression = []
-    # your code here
+    # Add clauses: rows and columns must have different colors
     for i in range(size):
         for j in range(size):
-            a = [item for item in points if item[0] == i and item[1] == j]
             for k in range(size):
-                if len(a) > 0 and a[0][2] != k:
-                    continue
                 for runner in range(size):
                     # First: add clauses for the row
                     if runner != i:
@@ -38,13 +35,11 @@ def get_expression(size, points=None):
                         clause_column.add_negative(i, j, k)
                         clause_column.add_negative(i, runner, k)
                         expression.append(clause_column)
+    # Add clauses: diagonals must have different colors
     for i in range(size):
         for j in range(size):
-            a = [item for item in points if item[0] == i and item[1] == j]
             for k in range(size):
-                if len(a) > 0 and a[0][2] != k:
-                    continue
-                # For up
+                # Up-left diagonal
                 for runner in range(1, size):
                     if i - runner < 0 or j - runner < 0:
                         break
@@ -52,7 +47,7 @@ def get_expression(size, points=None):
                     clause_diag_1_up.add_negative(i, j, k)
                     clause_diag_1_up.add_negative(i-runner, j-runner, k)
                     expression.append(clause_diag_1_up)
-                # For down
+                # Down-right diagonal
                 for runner in range(1, size):
                     if i + runner >= size or j + runner >= size:
                         break
@@ -61,7 +56,7 @@ def get_expression(size, points=None):
                     clause_diag_1_up.add_negative(i + runner, j + runner, k)
                     expression.append(clause_diag_1_up)
 
-                # For up
+                # Down-left diagonal
                 for runner in range(1, size):
                     if i - runner < 0 or j + runner >= size:
                         break
@@ -69,7 +64,7 @@ def get_expression(size, points=None):
                     clause_diag_1_up.add_negative(i, j, k)
                     clause_diag_1_up.add_negative(i-runner, j+runner, k)
                     expression.append(clause_diag_1_up)
-                # For down
+                # Up-right diagonal
                 for runner in range(1, size):
                     if i + runner >= size or j - runner < 0:
                         break
@@ -77,6 +72,18 @@ def get_expression(size, points=None):
                     clause_diag_1_up.add_negative(i, j, k)
                     clause_diag_1_up.add_negative(i + runner, j - runner, k)
                     expression.append(clause_diag_1_up)
+    # Add clauses: each cell must have a color
+    for i in range(size):
+        for j in range(size):
+            clause = Clause(size)
+            for k in range(size):
+                clause.add_positive(i, j, k)
+            expression.append(clause)
+    # Add clauses: we already know the color of some cells (given in 'points')
+    for (i, j, k) in points:
+        clause = Clause(size)
+        clause.add_positive(i, j, k)
+        expression.append(clause)
     return expression
 
 
