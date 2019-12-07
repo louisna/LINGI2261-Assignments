@@ -52,12 +52,12 @@ class BinPacking(Problem):
                                 new_state.bins[i].pop(itemA)
                                 new_state.bins[j].pop(itemB)
                                 # See if we put the two items in the new bins, it fits
-                                if new_state.can_fit(new_state.bins[i], int(weightB)) and new_state.can_fit(new_state.bins[j], int(weightA)):
+                                if new_state.can_fit(new_state.bins[i], int(weightB)) and new_state.can_fit(
+                                        new_state.bins[j], int(weightA)):
                                     # Add items to their new bons
                                     new_state.bins[i][itemB] = weightB
                                     new_state.bins[j][itemA] = weightA
                                     yield (i, j, itemA, itemB), new_state
-
 
     def fitness(self, state):
         """
@@ -73,6 +73,9 @@ class BinPacking(Problem):
                 fullness += int(weight)
             fitness += (fullness / state.capacity) ** 2
         return 1 - fitness / k
+
+    def value(self, state):
+        return self.fitness(state)
 
 
 class State:
@@ -96,7 +99,7 @@ class State:
                 self.bins = self.build_init()
             else:
                 self.bins = self.build_init2()
-    
+
     def copy_state(self):
         """
         Makes a copy of the state 'self'. A copy is done by creating a new State, and gives a copy of the layout of the
@@ -134,7 +137,6 @@ class State:
             init.append({ind: size})
         return init
 
-
     def can_fit(self, bin, itemsize):
         return sum(list(bin.values())) + itemsize <= self.capacity
 
@@ -154,6 +156,7 @@ def read_instance(instanceFile):
         items[line.split(' ')[0]] = int(line.split(' ')[1])
         line = file.readline()
     return capacitiy, items
+
 
 # Attention : Depending of the objective function you use, your goal can be to maximize or to minimize it
 def maxvalue(problem, limit=100, callback=None):
@@ -186,6 +189,7 @@ def maxvalue(problem, limit=100, callback=None):
         # Best is updated at each iteration, even if it degrades the optimal value
         best = best_next
     return best
+
 
 # Attention : Depending of the objective function you use, your goal can be to maximize or to minimize it
 def randomized_maxvalue(problem, limit=100, callback=None):
@@ -227,16 +231,17 @@ if __name__ == '__main__':
     bp_problem = BinPacking(init_state)
     bp_problem.successor(init_state)
     step_limit = 300
-    node = maxvalue(bp_problem, step_limit)
+    node = random_walk(bp_problem, step_limit)
     state = node.state
     # Then, we make the computation with build_init2
-    init_state2 = State(info[0], info[1], which=2)
-    bp_problem2 = BinPacking(init_state2)
-    bp_problem2.successor(init_state2)
-    node2 = maxvalue(bp_problem2, step_limit)
-    state2 = node2.state
+    # init_state2 = State(info[0], info[1], which=2)
+    # bp_problem2 = BinPacking(init_state2)
+    # bp_problem2.successor(init_state2)
+    # node2 = maxvalue(bp_problem2, step_limit)
+    # state2 = node2.state
     # Compare the two results, and print out the state giving the best fitness
-    if bp_problem.fitness(state) < bp_problem2.fitness(state2):
-        print(state)
-    else:
-        print(state2)
+    # if bp_problem.fitness(state) < bp_problem2.fitness(state2):
+    #    print(state)
+    # else:
+    #    print(state2)
+    print(state)
