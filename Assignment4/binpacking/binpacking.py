@@ -2,6 +2,7 @@
 """NAMES OF THE AUTHOR(S): Gaël Aglin <gael.aglin@uclouvain.be>"""
 from search import *
 import sys
+import time
 
 
 class BinPacking(Problem):
@@ -223,29 +224,42 @@ def randomized_maxvalue(problem, limit=100, callback=None):
         best = random.choice(five_best)[1]
     return best
 
-
+current_milli_time = lambda: int(round(time.time() * 1000))
 #####################
 #       Launch      #
 #####################
 
 if __name__ == '__main__':
+    steps = 0
+    times = 0.0
+    values = 0
     info = read_instance(sys.argv[1])
+    time_begin = current_milli_time()
     # First, we make the computation with build_init
     init_state = State(info[0], info[1], which=1)
     bp_problem = BinPacking(init_state)
     bp_problem.successor(init_state)
     step_limit = 300
-    node = random_walk(bp_problem, step_limit)
+    node = maxvalue(bp_problem, step_limit)
     state = node.state
     # Then, we make the computation with build_init2
-    # init_state2 = State(info[0], info[1], which=2)
-    # bp_problem2 = BinPacking(init_state2)
-    # bp_problem2.successor(init_state2)
-    # node2 = maxvalue(bp_problem2, step_limit)
-    # state2 = node2.state
+    init_state2 = State(info[0], info[1], which=2)
+    bp_problem2 = BinPacking(init_state2)
+    bp_problem2.successor(init_state2)
+    node2 = maxvalue(bp_problem2, step_limit)
+    state2 = node2.state
     # Compare the two results, and print out the state giving the best fitness
-    # if bp_problem.fitness(state) < bp_problem2.fitness(state2):
-    #    print(state)
-    # else:
-    #    print(state2)
-    print(state)
+    if bp_problem.fitness(state) < bp_problem2.fitness(state2):
+        print(state)
+        steps = node.step
+        values = bp_problem.fitness(state)
+    else:
+        print(state2)
+        steps = node2.step
+        values = bp_problem2.fitness(state2)
+
+    times = (current_milli_time()-time_begin)
+
+    print("STEPS : " + str(steps))
+    print("Times : " + str(times))
+    print("Values : " + str(((float(int(values*100000)))/100000)) )
