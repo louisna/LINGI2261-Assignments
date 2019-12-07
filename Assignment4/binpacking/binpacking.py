@@ -210,9 +210,13 @@ def randomized_maxvalue(problem, limit=100, callback=None):
         if possible_moves is None or len(possible_moves) == 0:
             return best
         for next in possible_moves:
+            # Compute the fitness
             value = problem.fitness(next.state)
+            # If the value is better than the "worst" value of the best successors
             if value < five_best[0][0]:
+                # We replace it...
                 five_best[0] = (value, next)
+                # ... And sort the list after
                 five_best.sort(key=lambda x: x[0], reverse=True)
         # Best is updated at each iteration, even if it degrades the optimal value
         # Best is updated with one of the 5 best moves discovered for the iteration

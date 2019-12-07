@@ -27,12 +27,12 @@ model."""
 
 
 def minisat(n, clauses, executable="./minisatLinux"):
-    clause_path = './tmp/clauses.tmp'
-    sol_path = './tmp/sol.tmp'
-    out_path = './tmp/minisat.out'
+    clause_path = './clauses.tmp'
+    sol_path = './sol.tmp'
+    out_path = './minisat.out'
     try:
         # Creating and writing the clause file
-        clause_file = open(clause_path, 'wt')
+        clause_file = open(clause_path, 'wt+')
         print('p cnf', n, len(clauses), file=clause_file)
         for c in clauses:
             print(c, '0', file=clause_file)
